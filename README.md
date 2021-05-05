@@ -4,6 +4,10 @@
 
 encode/decode several base + try to decode with all 
 
+## xor
+
+xor with key
+
 ## xor-self
 
 xor(n+1,n) : key is the previous char
