@@ -20,3 +20,7 @@ need symbols.dat in /usr/local/share/db/
 ## z_lib
 
 compress/decompress using zlib from terminal
+
+## cnc_post_httpd
+
+connect back to take control of server while wargame
