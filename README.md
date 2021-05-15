@@ -27,4 +27,4 @@ connect back to take control of server while wargame
 
 ## odissee_dl
 
-download video from odissee (using wget)
+download video from odissee (using curl)
