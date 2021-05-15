@@ -24,3 +24,7 @@ compress/decompress using zlib from terminal
 ## cnc_post_httpd
 
 connect back to take control of server while wargame
+
+## odissee_dl
+
+download video from odissee (using wget)
