@@ -73,7 +73,7 @@ except FileNotFoundError:
 continue_dl = 0
 try:
   stat(tmp)
-  vprint(f"Resuming preivous session...")
+  vprint(f"Resuming previous session...")
   continue_dl = 1
   starting_offset = len(open(tmp,"rb").read())
 except FileNotFoundError:
