@@ -32,3 +32,7 @@ download video from odissee (using curl)
 ## restore-ibd-frm
 
 restore database from ibd+frm files
+
+## pdfstrip
+
+remove metadata from PDF
