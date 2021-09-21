@@ -36,3 +36,9 @@ restore database from ibd+frm files
 ## pdfstrip
 
 remove metadata from PDF
+
+## ip-info
+
+gather informations about URL/IP/Host
+
+warning: for shodan, you will need a API key
