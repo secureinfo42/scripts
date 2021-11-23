@@ -42,3 +42,7 @@ remove metadata from PDF
 gather informations about URL/IP/Host
 
 warning: for shodan, you will need a API key
+
+## csv2mongo.py
+
+Convert CSV to MongoDB
