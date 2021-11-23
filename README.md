@@ -46,3 +46,7 @@ warning: for shodan, you will need a API key
 ## csv2mongo.py
 
 Convert CSV to MongoDB
+
+## find_pattern./py
+
+Find repeated pattern in string or file (azeazeazeazeqsdqsd -> aze : 4, qsd : 2)
