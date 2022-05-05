@@ -12,6 +12,7 @@ PAD = b'GIF89a\x01\x01\x01\x01\x01\x01\xE6'
 def custom_decode(data):
   if data:
     keyk = KEY * len(data)
+    keyk = keyk[:len(data)]
     data = b85decode(data)
     data = strxor(data,keyk[:len(data)])
     data = zlib.decompress(data)
@@ -22,6 +23,7 @@ def custom_decode(data):
 def custom_encode(data):
   if data:
     keyk = KEY * len(data)
+    keyk = keyk[:len(data)]
     data = PAD+data
     data = zlib.compress(data)
     data = strxor(data,keyk[:len(data)])
