@@ -50,3 +50,19 @@ Convert CSV to MongoDB
 ## find_pattern./py
 
 Find repeated pattern in string or file (azeazeazeazeqsdqsd -> aze : 4, qsd : 2)
+
+## dotfiles
+
+`.zshrc`
+oh-my-zsh based with modules and plugins styles
+
+`.ssh/config`
+for semi-persistant sessions
+
+`.config/htop/htoprc`
+htop cute config ^^
+
+`.vim`
+ton of plugins & modules + dark custom theme + custom shortcuts based on my Sublime Text habits
+
+## what's next ?…
