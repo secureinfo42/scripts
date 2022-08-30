@@ -1,6 +1,6 @@
 # Life savior scripts
 
-## Tools
+## Toolz
 
 Script          | Description
 ------          | -------------------------------
