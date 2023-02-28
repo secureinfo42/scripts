@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+
+from string import ascii_lowercase as lc
+from string import ascii_uppercase as uc
+from sys import exit,stdin,argv
+from getopt import getopt
+
+def rot47(txt):
+  # Source : https://rot47.net/
+  enc = []
+  for i in range(len(txt)):
+    j = ord(txt[i])
+    if j >= 33 and j <= 126:
+      enc.append(chr(33 + ((j + 14) % 94)))
+    else:
+      enc.append(txt[i])
+  return ''.join(enc)
+
+def rot_n(txt,n=13):
+  if n == 47:
+    return( rot47(txt) )
+  translate_alphabet = txt.maketrans(lc+uc, lc[n:]+lc[:n] + uc[n:]+uc[:n])
+  return (txt.translate(translate_alphabet))
+
+def usage():
+  print("")
+  print("Usage: rot <offset> [string]")
+  print("       <stdin>|rot <offset>")
+  print("")
+  print("Note: 0 < offset < 26 , offset = 47")
+  print("")
+  exit(0)
+
+
+def error(txt):
+  print("\nError: "+txt+"\n")
+  exit(1)
+
+
+if( len(argv) < 2 ):
+  usage()
+
+if( len(argv) == 2 ):
+  if( argv[1] == "-h" ):
+    usage()
+
+try:
+  shift = int(argv[1])
+except:
+  error(argv[1]+" is not a valid number")
+
+if len(argv) == 2:
+  c = ""
+  arg = ""
+  try:
+    c = stdin.read(1)
+    while c:
+      arg += c
+      c = stdin.read(1)
+  except KeyboardInterrupt:
+    stdout.flush()
+    #print "\n"
+    pass
+  print(rot_n(arg,shift),end="")
+
+else:
+  for arg in argv[2:]:
+    print(rot_n(arg,shift),end="")
+
+
