@@ -34,5 +34,3 @@ htop cute config ^^
 ton of plugins & modules + dark custom theme + custom shortcuts based on my Sublime Text habits
 
 
-
-## what's next ?…
