@@ -1,4 +1,4 @@
-#!/opt/local/bin/python3
+#!/opt/homebrew/bin/python3
 #coding: utf-8
 
 
@@ -17,8 +17,8 @@ from sys import argv, stdin, stdout, exit
 import base91
 # import base92
 import base45
-# import base41
-import base62
+import base36
+# import base62
 import base64
 import base65536
 from base128 import base128
@@ -45,6 +45,9 @@ r = basenc(b'JBSWY3DP',"32","-d")
 
 r = basenc("Hello","16")              # base 16
 r = basenc(b'48656c6c6f',"16","-d")
+
+r = basenc(1234,"36")                 # base 36
+r = basenc('ya',"36","-d") 
 
 r = basenc(b"Hello","45")             # base 45
 r = basenc(b'%69 VDL2',"45","-d") 
@@ -85,6 +88,13 @@ def basenc(data,base="64",op="-e"):
     if op == "-e": return( base64.b32encode(data) )
     else: return( base64.b32decode(data) )
 
+  ### Base36 ##########################################################################################################
+
+  if base == "36":
+
+    if op == "-e": return( str(base36.loads(data)) )
+    else: return( base36.dumps(int(data)) )
+
   ### Base45 ##########################################################################################################
 
   if base == "45":
@@ -92,22 +102,23 @@ def basenc(data,base="64",op="-e"):
     if op == "-e": return( base45.b45encode(data) )
     else: return( base45.b45decode(data) )
 
-  ### Base45 ##########################################################################################################
+  ### Base62 ##########################################################################################################
 
   if base == "62":
+    return("")
 
-    if op == "-e":
-      if type(data) is not int:
-        try:
-          data = int(data)
-        except:
-          raise Exception("Fatal: input data must be integer.")
-        return(base62.encode(data))
-      else:
-        return(base62.encode(data))
-    else:
-      dec = str(base62.decode(data.decode()))
-      return(dec)
+    # if op == "-e":
+    #   if type(data) is not int:
+    #     try:
+    #       data = int(data)
+    #     except:
+    #       raise Exception("Fatal: input data must be integer.")
+    #     return(base62.encode(data))
+    #   else:
+    #     return(base62.encode(data))
+    # else:
+    #   dec = str(base62.decode(data.decode()))
+    #   return(dec)
 
   ### Base64 ##########################################################################################################
 
@@ -130,21 +141,40 @@ def basenc(data,base="64",op="-e"):
     if op == "-e": return( base91.encode(data) );
     else: return( base91.decode(data.decode()) )
 
+  ### Base91 ##########################################################################################################
+
+  if base == "92":
+
+    if op == "-e": return( base92.encode(data) );
+    else: return( base92.decode(data.decode()) )
+
   ### Base128 #########################################################################################################
 
   if base == "128":
+    b128 = base128()
 
     if op == "-e":
-      b128 = base128()
-      encoded = list(b128.encode(data))
+      ret  = list(b128.encode(data))
+      encoded = []
+      for i in ret[:-1]:
+        hex = binascii.hexlify(i).decode()
+        encoded.append(hex)
+      encoded.append(ret[-1])
       return(encoded)
+
     if op == "-d":
-      b128 = base128()
+      decoded = ""
       try:
-        decoded = b''.join(b128.decode(data))
-        return(decoded)
-      except TypeError:
-        return
+        data = data.strip().decode()
+        offs = data.split(',')[-1].split('[')[1].split(']')[0]
+        data = [ x[2:-1] for x in data.split(',')[:-1] ]
+        data = [ binascii.unhexlify(x) for x in data ]
+        data += [[int(offs)]]
+        ret  = b128.decode(data)
+        decoded = b''.join(list(ret))
+      except:
+        pass
+      return(decoded)
 
   ### Base65536 #######################################################################################################
 
@@ -247,7 +277,7 @@ def error(txt,errcode=0):
 def hexdump(data):
   tmpf = "/tmp/_base_n.tmp"
   open(tmpf,"wb").write(data)
-  ret = popen("cat {}|xxd".format(tmpf)).read()
+  ret = popen("xxd {}|head".format(tmpf)).read()
   unlink(tmpf)
   return(ret)
 
@@ -281,13 +311,16 @@ base, args, op = "", "", ""
 if len(argv[1:]) >= 6: usage(1)
 
 for idx in range(len(argv[1:])+1):
-  if argv[idx] == '-b': base = argv[idx+1]
-  if argv[idx] == '-e': op = 'encode'
-  if argv[idx] == '-d': op = 'decode'
-  if argv[idx] == '-r': op = 'brute'
-  if argv[idx] == '-h': usage(0)
-  if argv[idx] == '-H': exemples()
-  if argv[idx] == '-f': data = read_file(argv[idx+1])
+  try:
+    if argv[idx] == '-b': base = argv[idx+1]
+    if argv[idx] == '-e': op = 'encode'
+    if argv[idx] == '-d': op = 'decode'
+    if argv[idx] == '-r': op = 'brute'
+    if argv[idx] == '-h': usage(0)
+    if argv[idx] == '-H': exemples()
+    if argv[idx] == '-f': data = read_file(argv[idx+1])
+  except:
+    usage(1)
 
 if not base: base='64'
 if not op:   op='encode'
@@ -305,11 +338,13 @@ if not data: data = read_stdin()
 
 if op == "encode":
   out = basenc(data,base,"-e")
-  if type(out) is str:
-    out = out.encode()
-  if base == '128':
-    out = out[0]
-  stdout.buffer.write(out)
+  # if type(out) is str:
+  try:
+    out = out.decode()
+  except:
+    pass
+  print(out)
+  # stdout.buffer.write(out)
 
 if op == "decode":
   try:
@@ -326,17 +361,24 @@ if op == "decode":
 
 if op == "brute":
   out = ""
-  for base in [16,32,45,62,64,85,128,65536]:
+  for base in ["16","32","45","64","85","128","65536"]:
+    ok = 0
     try:
-      out = basenc(data,str(base),"-d")
-    except binascii.Error:
-      continue
+      out = basenc(data,base,"-d")
+      ok  = 1
     except ValueError:
-      continue
-    if type(out) is str:
-      out = out.encode()
-    if out:
-      print("\nbase{}->decode :".format(base))
-      print("-------------------")
-      print("{}".format(hexdump(out)))
+      try:
+        out = basenc(data.strip(),base,"-d")
+        ok  = 1
+      except:
+        pass
+
+    if ok == 1:
+      try:
+        if len(out) > 2:
+          print("\nbase{}->decode :".format(base))
+          print("-----------------")
+          print("{}".format(hexdump(out)))
+      except:
+        pass
 
