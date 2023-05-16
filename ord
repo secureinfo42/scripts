@@ -1,0 +1,177 @@
+#!/opt/homebrew/bin/python3.8
+#coding: utf-8
+
+
+
+#######################################################################################################################
+#
+# Libs
+#
+##
+
+from getopt import getopt
+from base64 import b64encode as b64
+from os import popen
+import re
+from sys import argv, stdin, stdout, stderr, exit
+from colorama import Fore
+try:
+  from baseconvert import base as basenc
+except:
+  print("Error: 'baseconvert' module not found.\nYou should : pip3 install baseconvert\n")
+  exit(1)
+
+APP=argv[0].split("/")[-1]
+ERRCHR=f"{Fore.RED}?{Fore.RESET}"
+
+
+
+#######################################################################################################################
+#
+# Usage
+#
+##
+
+def usage(err):
+  msg ="""
+Usage:
+
+  %s [-b 2-36] [file]
+
+Exemples:
+
+  # Reading file
+  %s my_data.txt
+
+  # Using pipes:
+  cat my_data.txt|%s
+
+  # Treating stdin:
+  %s
+
+"""
+
+  print(msg % (APP,APP,APP,APP) )
+  exit(err)
+
+#----------------------------------------------------------------------------------------------------------------------
+
+def file_exists(filename):
+  try:
+    open(filename,"rb").close()
+    return(True)
+  except:
+    return(False)
+
+#----------------------------------------------------------------------------------------------------------------------
+
+def read_stdin():
+  ret = stdin.buffer.read()
+  return(ret)
+
+#----------------------------------------------------------------------------------------------------------------------
+
+def perror(txt,errcode=0):
+  msg   = f"{Fore.RED}%s: error: {txt}{Fore.RESET}\n"
+  stderr.write(msg % (APP))
+  if( errcode ):
+    exit(errcode)
+
+#----------------------------------------------------------------------------------------------------------------------
+
+def compute_ord(input_data,base=10,sep=" "):
+  global ERRCHR
+  try:
+    input_data = input_data.decode('utf-8')
+  except:
+    pass
+
+  alphabet = [ chr(x) for x in range(255+1) ]
+  ret = []
+
+  for data in input_data:
+    try:
+      ret.append( basenc( ord(data) , 10 , base , string=True ) )
+    except:
+      ret.append( f"{Fore.RED}?{Fore.RESET}" )
+
+  ret = sep.join(ret)
+
+  return( ret )
+
+
+
+#######################################################################################################################
+#
+# Argments parsing
+#
+##
+
+in_type    = "files"
+item       = ""
+arg_index  = 1
+
+#----------------------------------------------------------------------------------------------------------------------
+
+args = argv[1:]
+
+if( len(argv) >= 2 ):
+  if( argv[1] == "-h" ):
+    usage(0)
+
+#----------------------------------------------------------------------------------------------------------------------
+
+base = 10
+o,a = "",""
+if( len(argv) >= 2 ):
+  for a in argv[1:]:
+    if( o == "-b" ):
+      base = int(a)
+      arg_index += 2 # -b 16
+    o = a
+
+items = argv[arg_index:]
+if( len(items) == 0 ):
+  in_type = "stdin"
+
+
+
+
+#######################################################################################################################
+#
+# Operations
+#
+##
+
+#--- Input data -------------------------------------------------------------------------------------------------------
+
+buffers = []
+src_in = "-"
+
+if( in_type == "files" ):
+  for item in items:
+    content = ""
+    errfile = False # OK
+    if( file_exists(item) ):
+      content = open(item,"rb").read()
+    else:
+      errfile = True
+    buffers.append( { "content":content , "input":item , "error":errfile } )
+
+elif( in_type == "stdin" ):
+  buffers.append( { "content":read_stdin() , "input":"<stdin>", "error":False } )
+
+else:
+  error("bad input type",1)
+
+#--- Output data ------------------------------------------------------------------------------------------------------
+
+for buff in buffers:
+  if( buff["error"] == False ):
+    h = compute_ord(buff["content"],base)
+    if h:
+      print(h)
+
+for buff in buffers:
+  if( buff["error"] == True ):
+    perror("unable to read file '"+buff["input"]+"'")
