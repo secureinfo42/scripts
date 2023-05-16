@@ -16,7 +16,8 @@ pdfstrip        | remove metadata from PDF
 ip-info         | gather informations about URL/IP/Host. warning: for shodan, you will need a API key
 csv2mongo       | Convert CSV to MongoDB
 find_pattern    | Find repeated pattern in string or file (azeazeazeazeqsdqsd -> aze : 4, qsd : 2)
-
+chr             | chr for your shell, convert number to char in differents bases
+ord             | ord for your shell, convert chars to number in differents bases, use python3.8 module baseconvert
 
 
 ## Confz
